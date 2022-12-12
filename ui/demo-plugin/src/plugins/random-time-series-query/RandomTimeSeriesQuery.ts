@@ -20,7 +20,7 @@ import { PrometheusTimeSeriesQuerySpec } from './time-series-query-model';
 /**
  * The core Prometheus TimeSeriesQuery plugin for Perses.
  */
-export const PrometheusTimeSeriesQuery: TimeSeriesQueryPlugin<PrometheusTimeSeriesQuerySpec> = {
+export const RandomTimeSeriesQuery: TimeSeriesQueryPlugin<PrometheusTimeSeriesQuerySpec> = {
   getTimeSeriesData,
   OptionsEditorComponent: PrometheusTimeSeriesQueryEditor,
   createInitialOptions: () => ({

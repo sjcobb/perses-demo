@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { PrometheusTimeSeriesQuery } from './plugins/prometheus-time-series-query';
+import { RandomTimeSeriesQuery } from './plugins/prometheus-time-series-query';
 // @TODO: Move this to a more generic location;
 import { StaticListVariable } from './plugins/variable';
 import {
@@ -23,7 +23,7 @@ import { PrometheusDatasource } from './plugins/prometheus-datasource';
 
 // Export plugins under the same name as the kinds they handle from the plugin.json
 export {
-  PrometheusTimeSeriesQuery,
+  RandomTimeSeriesQuery,
   StaticListVariable,
   PrometheusLabelNamesVariable,
   PrometheusLabelValuesVariable,

@@ -18,9 +18,9 @@ import { DEFAULT_PROM, isDefaultPromSelector, isPrometheusDatasourceSelector } f
 import { PrometheusTimeSeriesQueryEditorProps, useQueryState, useFormatState } from './query-editor-model';
 
 /**
- * The options editor component for editing a PrometheusTimeSeriesQuery's spec.
+ * The options editor component for editing a RandomTimeSeriesQuery's spec.
  */
-export function PrometheusTimeSeriesQueryEditor(props: PrometheusTimeSeriesQueryEditorProps) {
+export function RandomTimeSeriesQueryEditor(props: PrometheusTimeSeriesQueryEditorProps) {
   const { onChange, value } = props;
   const { datasource } = value;
 

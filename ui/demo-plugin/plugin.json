@@ -1,0 +1,34 @@
+{
+  "kind": "PluginModule",
+  "metadata": {
+    "name": "Demo"
+  },
+  "spec": {
+    "plugins": [
+      {
+        "pluginType": "Panel",
+        "kind": "RandomChart",
+        "display": {
+          "name": "Random Chart",
+          "description": ""
+        }
+      },
+      {
+        "pluginType": "TimeSeriesQuery",
+        "kind": "RandomTimeSeriesQuery",
+        "display": {
+          "name": "Random Time Series Query",
+          "description": ""
+        }
+      },
+      {
+        "pluginType": "Datasource",
+        "kind": "RandomDatasource",
+        "display": {
+          "name": "Random Datasource",
+          "description": ""
+        }
+      }
+    ]
+  }
+}

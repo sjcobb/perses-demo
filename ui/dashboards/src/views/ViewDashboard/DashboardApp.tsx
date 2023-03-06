@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import { Box } from '@mui/material';
+import { QueryInspector } from '@perses-dev/plugin-system';
 import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import { DashboardResource } from '@perses-dev/core';
 import {
@@ -98,6 +99,7 @@ export const DashboardApp = (props: DashboardAppProps) => {
       />
       <Box sx={{ padding: (theme) => theme.spacing(2) }}>
         <ErrorBoundary FallbackComponent={ErrorAlert}>
+          <QueryInspector showTotalQueries={true} />
           <Dashboard />
         </ErrorBoundary>
         <PanelDrawer />

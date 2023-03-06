@@ -74,6 +74,7 @@ export interface RangeQueryRequestParameters {
   end: UnixTimestampSeconds;
   step: DurationSeconds;
   timeout?: DurationString;
+  warnings_header?: string;
 }
 
 export type RangeQueryResponse = ApiResponse<MatrixData>;

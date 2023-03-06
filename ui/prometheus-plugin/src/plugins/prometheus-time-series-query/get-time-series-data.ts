@@ -61,8 +61,9 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
     step,
   });
 
-  // TODO: What about error responses from Prom that have a response body?
   const result = response.data?.result ?? [];
+
+  const warnings = response.status === 'success' ? response.warnings : [];
 
   // Transform response
   const chartData: TimeSeriesData = {
@@ -89,6 +90,7 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
         formattedName,
       };
     }),
+    warnings,
   };
 
   return chartData;

@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { fetchJson, RequestHeaders } from '@perses-dev/core';
+import { fetch, fetchJson, RequestHeaders } from '@perses-dev/core';
 import {
   InstantQueryRequestParameters,
   InstantQueryResponse,
@@ -26,6 +26,7 @@ import {
 interface PrometheusClientOptions {
   datasourceUrl: string;
   headers?: RequestHeaders;
+  warnings_header?: string;
 }
 
 export interface PrometheusClient {
@@ -39,6 +40,7 @@ export interface PrometheusClient {
 export interface QueryOptions {
   datasourceUrl: string;
   headers?: RequestHeaders;
+  warnings_header?: string;
 }
 
 /**
@@ -83,7 +85,7 @@ function fetchWithGet<T extends RequestParams<T>, TResponse>(apiURI: string, par
 }
 
 function fetchWithPost<T extends RequestParams<T>, TResponse>(apiURI: string, params: T, queryOptions: QueryOptions) {
-  const { datasourceUrl, headers } = queryOptions;
+  const { datasourceUrl, headers, warnings_header } = queryOptions;
 
   const url = `${datasourceUrl}${apiURI}`;
   const init = {
@@ -94,7 +96,7 @@ function fetchWithPost<T extends RequestParams<T>, TResponse>(apiURI: string, pa
     },
     body: createSearchParams(params),
   };
-  return fetchJson<TResponse>(url, init);
+  return fetchResults<TResponse>(warnings_header, url, init);
 }
 
 // Request parameter values we know how to serialize
@@ -130,4 +132,16 @@ function createSearchParams<T extends RequestParams<T>>(params: T) {
     }
   }
   return searchParams;
+}
+
+/**
+ * Fetch JSON and parse warnings for query inspector
+ */
+export async function fetchResults<T>(warnings_header?: string, ...args: Parameters<typeof global.fetch>) {
+  const response = await fetch(...args);
+  const json: T = await response.json();
+  const entries = [...response.headers.entries()];
+  const entry = entries.find((entry) => entry[0] === warnings_header);
+  const warnings = entry?.[1];
+  return { ...json, warnings };
 }

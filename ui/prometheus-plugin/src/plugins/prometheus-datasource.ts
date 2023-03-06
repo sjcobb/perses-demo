@@ -18,13 +18,14 @@ import { instantQuery, rangeQuery, labelNames, labelValues, PrometheusClient } f
 export interface PrometheusDatasourceSpec {
   direct_url?: string;
   headers?: RequestHeaders;
+  warnings_header?: string;
 }
 
 /**
  * Creates a PrometheusClient for a specific datasource spec.
  */
 const createClient: DatasourcePlugin<PrometheusDatasourceSpec, PrometheusClient>['createClient'] = (spec, options) => {
-  const { direct_url, headers } = spec;
+  const { direct_url, headers, warnings_header } = spec;
   const { proxyUrl } = options;
 
   // Use the direct URL if specified, but fallback to the proxyUrl by default if not specified
@@ -38,10 +39,10 @@ const createClient: DatasourcePlugin<PrometheusDatasourceSpec, PrometheusClient>
     options: {
       datasourceUrl,
     },
-    instantQuery: (params) => instantQuery(params, { datasourceUrl, headers }),
-    rangeQuery: (params) => rangeQuery(params, { datasourceUrl, headers }),
-    labelNames: (params) => labelNames(params, { datasourceUrl, headers }),
-    labelValues: (params) => labelValues(params, { datasourceUrl, headers }),
+    instantQuery: (params) => instantQuery(params, { datasourceUrl, headers, warnings_header }),
+    rangeQuery: (params) => rangeQuery(params, { datasourceUrl, headers, warnings_header }),
+    labelNames: (params) => labelNames(params, { datasourceUrl, headers, warnings_header }),
+    labelValues: (params) => labelValues(params, { datasourceUrl, headers, warnings_header }),
   };
 };
 

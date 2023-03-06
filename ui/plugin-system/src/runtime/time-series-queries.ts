@@ -25,6 +25,8 @@ export interface UseTimeSeriesQueryOptions {
   suggestedStepMs?: number;
 }
 
+export const TIME_SERIES_QUERY_KEY = 'TimeSeriesQuery';
+
 /**
  * Returns a serialized string of the current state of variable values.
  */
@@ -65,6 +67,7 @@ function getQueryOptions({
   if (variableDependencies) {
     waitToLoad = variableDependencies.some((v) => variableState[v]?.loading);
   }
+
   const queryEnabled = plugin !== undefined && !waitToLoad;
 
   return {
@@ -77,7 +80,7 @@ function getQueryOptions({
  * Runs a time series query using a plugin and returns the results.
  */
 export const useTimeSeriesQuery = (definition: TimeSeriesQueryDefinition, options?: UseTimeSeriesQueryOptions) => {
-  const { data: plugin } = usePlugin('TimeSeriesQuery', definition.spec.plugin.kind);
+  const { data: plugin } = usePlugin(TIME_SERIES_QUERY_KEY, definition.spec.plugin.kind);
   const context = useTimeSeriesQueryContext();
 
   const { queryEnabled, queryKey } = getQueryOptions({ plugin, definition, context });
@@ -104,7 +107,7 @@ export function useTimeSeriesQueries(definitions: TimeSeriesQueryDefinition[], o
   const context = useTimeSeriesQueryContext();
 
   const pluginLoaderResponse = usePlugins(
-    'TimeSeriesQuery',
+    TIME_SERIES_QUERY_KEY,
     definitions.map((d) => ({ kind: d.spec.plugin.kind }))
   );
 
@@ -118,7 +121,7 @@ export function useTimeSeriesQueries(definitions: TimeSeriesQueryDefinition[], o
         queryFn: async () => {
           // Keep options out of query key so we don't re-run queries because suggested step changes
           const ctx: TimeSeriesQueryContext = { ...context, suggestedStepMs: options?.suggestedStepMs };
-          const plugin = await getPlugin('TimeSeriesQuery', definition.spec.plugin.kind);
+          const plugin = await getPlugin(TIME_SERIES_QUERY_KEY, definition.spec.plugin.kind);
           const data = await plugin.getTimeSeriesData(definition.spec.plugin.spec, ctx);
           return data;
         },
@@ -127,6 +130,9 @@ export function useTimeSeriesQueries(definitions: TimeSeriesQueryDefinition[], o
   });
 }
 
+/**
+ * Build the context object from data available at runtime
+ */
 function useTimeSeriesQueryContext(): TimeSeriesQueryContext {
   // Build the context object from data available at runtime
   const { absoluteTimeRange, refreshKey } = useTimeRange();

@@ -58,6 +58,7 @@ describe('PluginSpecEditor', () => {
   it('shows an error if plugin fails to load', async () => {
     renderComponent({ pluginType: 'Variable', pluginKind: 'DoesNotExist', value: {}, onChange: jest.fn() });
     const errorAlert = await screen.findByRole('alert');
+    // TODO: fix test error
     expect(errorAlert).toHaveTextContent(/doesnotexist/i);
   });
 });

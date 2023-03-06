@@ -49,6 +49,7 @@ export interface TimeSeriesData {
   timeRange?: AbsoluteTimeRange;
   stepMs?: number;
   series: TimeSeries[];
+  warnings?: string[];
 }
 
 export interface TimeSeries {

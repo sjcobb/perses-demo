@@ -26,7 +26,7 @@ export function ErrorAlert(props: ErrorAlertProps) {
   const { error } = props;
 
   const { errors: errorMessages } = useMemo(
-    () => getUserFriendlyErrors(error, 'There was an error loading this page. Please try again.'),
+    () => getUserFriendlyErrors(error, 'Failed to load response data.'),
     [error]
   );
 

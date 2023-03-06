@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Paper,
   Table,
   TableBody,
@@ -120,6 +121,16 @@ export function QueryInspector(props: QueryInspectorProps) {
               </TableBody>
             </Table>
           </TableContainer>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              console.log(
+                'TODO: disable query limit headers, will call setDatasourceHeaders from @perses-dev/plugin-system'
+              );
+            }}
+          >
+            Disable Query Truncation
+          </Button>
         </Box>
       )}
     </Stack>

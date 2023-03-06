@@ -10,10 +10,9 @@ import {
   Typography,
   Stack,
 } from '@mui/material';
-import { useQueryClient, Query, QueryCache, QueryKey } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { TimeSeriesQueryDefinition, UnknownSpec } from '@perses-dev/core';
-import { TIME_SERIES_QUERY_KEY, useTimeRange } from '../runtime';
-import { TimeSeriesData } from '../model';
+import { useActiveTimeSeriesQueries, useTimeRange } from '../runtime';
 
 export interface WarningDisplay {
   query: string;
@@ -34,7 +33,7 @@ export function QueryInspector(props: QueryInspectorProps) {
 
   const { absoluteTimeRange } = useTimeRange();
 
-  const querySummary = useCurrentTimeSeriesQueries();
+  const querySummary = useActiveTimeSeriesQueries();
 
   const warnings: WarningDisplay[] = [];
   querySummary.forEach((query) => {
@@ -127,23 +126,6 @@ export function QueryInspector(props: QueryInspectorProps) {
   );
 }
 
-export function getTimeSeriesQuerySummary(cache: QueryCache) {
-  const queries = cache
-    .findAll({ type: 'active' })
-    .filter((query) => {
-      const firstPart = query.queryKey?.[0] as UnknownSpec;
-      if (firstPart?.kind) {
-        return (firstPart?.kind as string).startsWith(TIME_SERIES_QUERY_KEY);
-      }
-      return false;
-    })
-    .filter((query) => query.isActive)
-    .map((query) => {
-      return query as Query<TimeSeriesData, unknown, TimeSeriesData, QueryKey>;
-    });
-  return queries;
-}
-
 /**
  * Get response headers for query inspection summary
  */
@@ -161,14 +143,4 @@ export function getResponseHeadersSummary(header: string) {
     return header;
   }
   return '';
-}
-
-/**
- * Show info about running time series queries for results summary
- */
-export function useCurrentTimeSeriesQueries() {
-  const queryClient = useQueryClient();
-  const queryCache = queryClient.getQueryCache();
-  const timeSeriesQueries = getTimeSeriesQuerySummary(queryCache);
-  return timeSeriesQueries;
 }

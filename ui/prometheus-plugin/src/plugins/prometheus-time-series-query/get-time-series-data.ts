@@ -70,7 +70,7 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
   const warningMessage = warnings && warnings[0] ? warnings[0] : '';
   if (warningMessage !== '') {
     actions.push({
-      kind: 'Warning',
+      type: 'warning',
       message: warningMessage,
     });
   }
@@ -100,7 +100,6 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
         formattedName,
       };
     }),
-    warnings,
     actions,
   };
 

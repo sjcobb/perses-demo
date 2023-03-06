@@ -12,6 +12,7 @@
 // limitations under the License.
 
 export interface Action {
-  kind: 'Error' | 'Info' | 'Success' | 'Warning';
+  type: 'error' | 'info' | 'warning';
   message: string;
+  display?: 'tag'; // TODO: define other action types and alternate display options
 }

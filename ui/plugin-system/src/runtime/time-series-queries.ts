@@ -11,10 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TimeSeriesQueryDefinition } from '@perses-dev/core';
-import { useQuery, useQueries } from '@tanstack/react-query';
-import { TimeSeriesQueryContext } from '../model';
-import { TimeSeriesQueryPlugin } from '../model';
+import { useQuery, useQueries, useQueryClient, Query, QueryCache, QueryKey } from '@tanstack/react-query';
+import { TimeSeriesQueryDefinition, UnknownSpec } from '@perses-dev/core';
+import { TimeSeriesData, TimeSeriesQueryContext, TimeSeriesQueryPlugin } from '../model';
 import { VariableStateMap } from './template-variables';
 import { useTemplateVariableValues } from './template-variables';
 import { useTimeRange } from './TimeRangeProvider';
@@ -131,10 +130,9 @@ export function useTimeSeriesQueries(definitions: TimeSeriesQueryDefinition[], o
 }
 
 /**
- * Build the context object from data available at runtime
+ * Build the time series query context object from data available at runtime
  */
 function useTimeSeriesQueryContext(): TimeSeriesQueryContext {
-  // Build the context object from data available at runtime
   const { absoluteTimeRange, refreshKey } = useTimeRange();
   const variableState = useTemplateVariableValues();
   const datasourceStore = useDatasourceStore();
@@ -145,4 +143,34 @@ function useTimeSeriesQueryContext(): TimeSeriesQueryContext {
     datasourceStore,
     refreshKey,
   };
+}
+
+/**
+ * Get active time series queries for query results summary
+ */
+export function useActiveTimeSeriesQueries() {
+  const queryClient = useQueryClient();
+  const queryCache = queryClient.getQueryCache();
+  const timeSeriesQueries = getActiveTimeSeriesQueries(queryCache);
+  return timeSeriesQueries;
+}
+
+/**
+ * Filter all cached queries down to only active time series queries
+ */
+export function getActiveTimeSeriesQueries(cache: QueryCache) {
+  const queries = cache
+    .findAll({ type: 'active' })
+    .filter((query) => {
+      const firstPart = query.queryKey?.[0] as UnknownSpec;
+      if (firstPart?.kind) {
+        return (firstPart?.kind as string).startsWith(TIME_SERIES_QUERY_KEY);
+      }
+      return false;
+    })
+    .filter((query) => query.isActive)
+    .map((query) => {
+      return query as Query<TimeSeriesData, unknown, TimeSeriesData, QueryKey>;
+    });
+  return queries;
 }

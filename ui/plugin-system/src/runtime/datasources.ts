@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DatasourceSelector, DatasourceSpec } from '@perses-dev/core';
+import { DatasourceSelector, DatasourceSpec, RequestHeaders } from '@perses-dev/core';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 
@@ -28,6 +28,15 @@ export interface DatasourceStore {
    * Gets a list of datasource metadata for a plugin kind.
    */
   listDatasourceMetadata(datasourcePluginKind: string): Promise<DatasourceMetadata[]>;
+
+  /**
+   * Global datasource HTTP headers
+   */
+  activeDatasourceHeaders?: RequestHeaders;
+  /**
+   * Override custom HTTP Headers
+   */
+  setActiveDatasourceHeaders: (value: RequestHeaders) => void;
 }
 
 export interface DatasourceMetadata {
@@ -60,4 +69,13 @@ export function useListDatasources(datasourcePluginKind: string) {
 export function useDatasourceClient<Client>(selector: DatasourceSelector) {
   const store = useDatasourceStore();
   return useQuery<Client>(['getDatasourceClient', selector], () => store.getDatasourceClient<Client>(selector));
+}
+
+/**
+ * Adds ability to get and set custom headers defined in datasource spec
+ */
+export function useActiveDatasourceHeaders() {
+  // TODO: pass datasourceName as optional param to only override specific datasource
+  const { activeDatasourceHeaders, setActiveDatasourceHeaders } = useDatasourceStore();
+  return { activeDatasourceHeaders, setActiveDatasourceHeaders };
 }

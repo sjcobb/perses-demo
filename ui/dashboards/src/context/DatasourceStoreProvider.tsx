@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   DashboardResource,
   DashboardSpec,
@@ -19,6 +19,7 @@ import {
   DatasourceSelector,
   DatasourceSpec,
   GlobalDatasource,
+  RequestHeaders,
   useEvent,
 } from '@perses-dev/core';
 import {
@@ -56,6 +57,8 @@ export interface DatasourceApi {
 export function DatasourceStoreProvider(props: DatasourceStoreProviderProps) {
   const { dashboardResource, datasourceApi, children } = props;
   const { project } = dashboardResource.metadata;
+
+  const [headerOverrides, setHeaderOverrides] = useState<RequestHeaders>();
 
   const { getPlugin, listPluginMetadata } = usePluginRegistry();
 
@@ -96,10 +99,22 @@ export function DatasourceStoreProvider(props: DatasourceStoreProviderProps) {
     async function getClient<Client>(selector: DatasourceSelector): Promise<Client> {
       const { kind } = selector;
       const [{ spec, proxyUrl }, plugin] = await Promise.all([findDatasource(selector), getPlugin('Datasource', kind)]);
-      return plugin.createClient(spec.plugin.spec, { proxyUrl }) as Client;
+
+      // default HTTP request headers can be overriden through plugin system
+      const datasourceSpec = { ...spec.plugin.spec };
+      if (headerOverrides !== undefined) {
+        datasourceSpec.headers = headerOverrides;
+      }
+
+      return plugin.createClient(datasourceSpec, { proxyUrl }) as Client;
     },
-    [findDatasource, getPlugin]
+    [findDatasource, getPlugin, headerOverrides]
   );
+
+  // Override the default HTTP Headers set in datasource plugin spec
+  const setActiveDatasourceHeaders = useCallback((value: RequestHeaders) => {
+    setHeaderOverrides(value);
+  }, []);
 
   const listDatasourceMetadata = useEvent(async (datasourcePluginKind: string): Promise<DatasourceMetadata[]> => {
     const [pluginMetadata, datasources, globalDatasources] = await Promise.all([
@@ -146,8 +161,10 @@ export function DatasourceStoreProvider(props: DatasourceStoreProviderProps) {
       getDatasource,
       getDatasourceClient,
       listDatasourceMetadata,
+      activeDatasourceHeaders: headerOverrides,
+      setActiveDatasourceHeaders,
     }),
-    [getDatasource, getDatasourceClient, listDatasourceMetadata]
+    [getDatasource, getDatasourceClient, listDatasourceMetadata, headerOverrides, setActiveDatasourceHeaders]
   );
 
   return <DatasourceStoreContext.Provider value={ctxValue}>{children}</DatasourceStoreContext.Provider>;

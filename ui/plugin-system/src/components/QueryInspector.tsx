@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { TimeSeriesQueryDefinition, UnknownSpec } from '@perses-dev/core';
-import { useActiveTimeSeriesQueries, useTimeRange } from '../runtime';
+import { useActiveDatasourceHeaders, useActiveTimeSeriesQueries, useTimeRange } from '../runtime';
 
 export interface WarningDisplay {
   query: string;
@@ -31,6 +31,8 @@ export function QueryInspector(props: QueryInspectorProps) {
   const queries = queryClient.getQueryCache().findAll();
   const activeQueries = queries.filter((query) => query.state.status === 'loading');
   const completedQueries = queries.filter((query) => query.state.status === 'success');
+
+  const { setActiveDatasourceHeaders } = useActiveDatasourceHeaders();
 
   const { absoluteTimeRange } = useTimeRange();
 
@@ -124,9 +126,8 @@ export function QueryInspector(props: QueryInspectorProps) {
           <Button
             variant="outlined"
             onClick={() => {
-              console.log(
-                'TODO: disable query limit headers, will call setDatasourceHeaders from @perses-dev/plugin-system'
-              );
+              // clear query limit HTTP headers
+              setActiveDatasourceHeaders({});
             }}
           >
             Disable Query Truncation

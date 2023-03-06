@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Action } from '@perses-dev/core';
 import { TimeSeriesData, TimeSeriesQueryPlugin } from '@perses-dev/plugin-system';
 import { fromUnixTime } from 'date-fns';
 import {
@@ -63,7 +64,23 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
 
   const result = response.data?.result ?? [];
 
+  const actions: Action[] = [];
+  const errorMessage = response.status === 'error' ? response.error : '';
+  if (errorMessage !== '') {
+    actions.push({
+      kind: 'Error',
+      message: errorMessage,
+    });
+  }
+
   const warnings = response.status === 'success' ? response.warnings : [];
+  const warningMessage = warnings && warnings[0] ? warnings[0] : '';
+  if (warningMessage !== '') {
+    actions.push({
+      kind: 'Warning',
+      message: warningMessage,
+    });
+  }
 
   // Transform response
   const chartData: TimeSeriesData = {
@@ -91,6 +108,7 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
       };
     }),
     warnings,
+    actions,
   };
 
   return chartData;

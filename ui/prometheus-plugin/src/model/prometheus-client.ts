@@ -142,6 +142,6 @@ export async function fetchResults<T>(warnings_header?: string, ...args: Paramet
   const json: T = await response.json();
   const entries = [...response.headers.entries()];
   const entry = entries.find((entry) => entry[0] === warnings_header);
-  const warnings = entry?.[1];
-  return { ...json, warnings };
+  const warning = entry?.[1];
+  return { ...json, warnings: [warning] };
 }

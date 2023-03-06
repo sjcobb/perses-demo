@@ -64,15 +64,8 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
 
   const result = response.data?.result ?? [];
 
+  // Custom display for response header warnings, configurable error responses display coming next
   const actions: Action[] = [];
-  const errorMessage = response.status === 'error' ? response.error : '';
-  if (errorMessage !== '') {
-    actions.push({
-      kind: 'Error',
-      message: errorMessage,
-    });
-  }
-
   const warnings = response.status === 'success' ? response.warnings : [];
   const warningMessage = warnings && warnings[0] ? warnings[0] : '';
   if (warningMessage !== '') {
@@ -97,7 +90,7 @@ export const getTimeSeriesData: TimeSeriesQueryPlugin<PrometheusTimeSeriesQueryS
         name = query;
       }
 
-      // query editor allows you to define an optional series_name_format
+      // Query editor allows you to define an optional series_name_format
       // property to customize legend and tooltip display
       const formattedName = spec.series_name_format ? formatSeriesName(spec.series_name_format, metric) : name;
 

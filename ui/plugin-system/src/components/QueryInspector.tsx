@@ -15,8 +15,9 @@ import { TimeSeriesQueryDefinition, UnknownSpec } from '@perses-dev/core';
 import { TIME_SERIES_QUERY_KEY, useTimeRange } from '../runtime';
 import { TimeSeriesData } from '../model';
 
-export interface WarningEvent {
+export interface WarningDisplay {
   query: string;
+  header: string;
   summary: string;
 }
 
@@ -35,15 +36,19 @@ export function QueryInspector(props: QueryInspectorProps) {
 
   const querySummary = useCurrentTimeSeriesQueries();
 
-  const warningEvents: WarningEvent[] = [];
+  const warnings: WarningDisplay[] = [];
   querySummary.forEach((query) => {
     const queryData = query.state.data;
-    if (queryData && queryData.warnings) {
+    if (queryData && queryData.actions) {
       const queryKey = query.queryKey as [TimeSeriesQueryDefinition<UnknownSpec>];
-      warningEvents.push({
-        query: String(queryKey[0].spec.plugin.spec.query),
-        summary: getResponseHeadersSummary(queryData.warnings),
-      });
+      const warningMessage = queryData.actions[0]?.message;
+      if (warningMessage) {
+        warnings.push({
+          query: String(queryKey[0].spec.plugin.spec.query),
+          header: warningMessage,
+          summary: getResponseHeadersSummary(warningMessage),
+        });
+      }
     }
   });
 
@@ -83,7 +88,7 @@ export function QueryInspector(props: QueryInspectorProps) {
         </TableContainer>
       </Box>
 
-      {warningEvents.length > 0 && (
+      {warnings.length > 0 && (
         <Box>
           <Typography variant="h3" mb={1}>
             Warnings
@@ -99,14 +104,16 @@ export function QueryInspector(props: QueryInspectorProps) {
               <TableHead>
                 <TableRow>
                   <TableCell>Query</TableCell>
-                  <TableCell>Warning</TableCell>
+                  <TableCell>Header</TableCell>
+                  <TableCell>Summary</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {warningEvents.map((details, idx) => {
+                {warnings.map((details, idx) => {
                   return (
                     <TableRow key={idx}>
                       <TableCell>{details.query}</TableCell>
+                      <TableCell>{details.header}</TableCell>
                       <TableCell>{details.summary}</TableCell>
                     </TableRow>
                   );
@@ -140,15 +147,18 @@ export function getTimeSeriesQuerySummary(cache: QueryCache) {
 /**
  * Get response headers for query inspection summary
  */
-export function getResponseHeadersSummary(response: string | string[]): string {
-  if (!response) {
-    return '';
+export function getResponseHeadersSummary(header: string) {
+  // TODO: configurable formatting
+  try {
+    const summary = JSON.parse(header);
+    if (summary.Limited) {
+      return 'At least one set of query results was too large and had to be truncated.';
+    }
+  } catch {
+    // No-op
   }
-  if (typeof response === 'string') {
-    return response;
-  }
-  if (response.length) {
-    return response[0] ?? '';
+  if (typeof header === 'string') {
+    return header;
   }
   return '';
 }

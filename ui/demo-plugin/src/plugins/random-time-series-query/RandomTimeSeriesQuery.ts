@@ -14,7 +14,7 @@
 import { TimeSeriesQueryPlugin } from '@perses-dev/plugin-system';
 import { parseTemplateVariables } from '../../model';
 import { getTimeSeriesData } from './get-time-series-data';
-import { PrometheusTimeSeriesQueryEditor } from './PrometheusTimeSeriesQueryEditor';
+import { PrometheusTimeSeriesQueryEditor } from './RandomTimeSeriesQueryEditor';
 import { PrometheusTimeSeriesQuerySpec } from './time-series-query-model';
 
 /**
